@@ -271,6 +271,10 @@ export interface Database {
         Args: { thread: string };
         Returns: undefined;
       };
+      askapple_total_visits: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
     };
     Enums: {
       user_role: "member" | "moderator" | "admin";
