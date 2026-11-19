@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Avatar from "@/components/Avatar";
 import EditProfileForm from "@/components/EditProfileForm";
 import ThreadCard from "@/components/ThreadCard";
-import { createClient } from "@/utils/supabase/server";
+import { createClient, getServerUser } from "@/utils/supabase/server";
 import type { Profile, ThreadWithRelations } from "@/types/database";
 import { timeAgo } from "@/utils/format";
 
@@ -23,10 +23,21 @@ export default async function ProfilePage({
     .eq("id", id)
     .maybeSingle();
 
-  if (error || !profileData) notFound();
-  const profile = profileData as Profile;
+  let profile = profileData as Profile | null;
 
-  const [threadsResult, answersResult, {
+  // If an OAuth/guest user has no profile row yet, create it on first view.
+  if (!profile) {
+    const {
+      data: { user: currentUser },
+    } = await supabase.auth.getUser();
+    if (currentUser?.id === id) {
+      profile = (await getServerUser()) as Profile | null;
+    }
+  }
+
+  if (error || !profile) notFound();
+
+  const [threadsResult, answersResult, postsResult, {
     data: { user },
   }] = await Promise.all([
     supabase
@@ -42,11 +53,29 @@ export default async function ProfilePage({
       .select("*", { count: "exact", head: true })
       .eq("author_id", id)
       .eq("is_accepted", true),
+    supabase
+      .from("askapple_posts")
+      .select(
+        "id, body, created_at, is_accepted, post_number, threads:askapple_threads!askapple_posts_thread_id_fkey(id, title)",
+      )
+      .eq("author_id", id)
+      .gt("post_number", 1)
+      .eq("is_deleted", false)
+      .order("created_at", { ascending: false })
+      .limit(20),
     supabase.auth.getUser(),
   ]);
 
   const threads = (threadsResult.data ?? []) as unknown as ThreadWithRelations[];
   const acceptedAnswers = answersResult.count ?? 0;
+  const posts = (postsResult.data ?? []) as unknown as Array<{
+    id: string;
+    body: string;
+    created_at: string;
+    is_accepted: boolean;
+    post_number: number;
+    threads: { id: string; title: string } | null;
+  }>;
   const isOwnProfile = user?.id === id;
 
   return (
@@ -69,6 +98,13 @@ export default async function ProfilePage({
               </span>
             )}
           </div>
+          {isOwnProfile && profile.email && (
+            <p className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
+              <a href={`mailto:${profile.email}`} className="hover:text-[#0071e3] hover:underline">
+                {profile.email}
+              </a>
+            </p>
+          )}
           <p className="mt-1 text-sm text-gray-500 dark:text-neutral-400">
             Member since {new Date(profile.created_at).toLocaleDateString()}
           </p>
@@ -106,6 +142,41 @@ export default async function ProfilePage({
         <div className="space-y-3">
           {threads.map((thread) => (
             <ThreadCard key={thread.id} thread={thread} />
+          ))}
+        </div>
+      )}
+
+      <h2 className="mb-4 mt-10 text-lg font-semibold text-gray-900 dark:text-white">
+        Answers & replies by {profile.full_name || "this member"}
+      </h2>
+      {posts.length === 0 ? (
+        <p className="rounded-2xl border border-dashed border-gray-300 p-8 text-center text-sm text-gray-500 dark:border-neutral-700 dark:text-neutral-400">
+          No answers yet.
+        </p>
+      ) : (
+        <div className="space-y-3">
+          {posts.map((post) => (
+            <Link
+              key={post.id}
+              href={`/t/${post.threads?.id ?? ""}#post-${post.id}`}
+              className="block rounded-2xl border border-gray-200 bg-white p-4 hover:border-[#0071e3] dark:border-neutral-800 dark:bg-neutral-900"
+            >
+              <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-neutral-400">
+                <span>Replied in</span>
+                <span className="font-medium text-gray-800 dark:text-neutral-200">
+                  {post.threads?.title ?? "a thread"}
+                </span>
+                {post.is_accepted && (
+                  <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700 dark:bg-green-950/40 dark:text-green-300">
+                    Accepted
+                  </span>
+                )}
+                <span className="ml-auto">{timeAgo(post.created_at)}</span>
+              </div>
+              <p className="mt-2 line-clamp-3 text-sm text-gray-600 dark:text-neutral-300">
+                {post.body}
+              </p>
+            </Link>
           ))}
         </div>
       )}
