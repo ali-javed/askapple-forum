@@ -13,7 +13,7 @@ export default function Footer() {
             Ask a question
           </Link>
           <a
-            href="https://github.com"
+            href="https://github.com/ali-javed/askapple-forum#guidelines"
             target="_blank"
             rel="noreferrer"
             className="hover:text-[#0071e3]"

@@ -3,6 +3,11 @@
 A community support forum for Apple product users, built with the same
 Vercel + Supabase stack as `refint-clean`.
 
+## Guidelines
+
+- Be respectful.
+- Be helpful.
+
 ## Stack
 
 | Layer | Choice |
