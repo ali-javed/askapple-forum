@@ -109,14 +109,14 @@ export default async function ProfilePage({
       <div className="flex flex-wrap items-start gap-5 rounded-2xl border border-gray-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
         <Avatar
           name={profile.full_name}
-          email={profile.email}
+          email={profile.full_name || "?"}
           url={profile.avatar_url}
           size={72}
         />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
-              {profile.full_name || profile.email.split("@")[0]}
+              {profile.full_name || "Community member"}
             </h1>
             {profile.role !== "member" && (
               <span className="rounded-full bg-purple-100 px-2.5 py-1 text-[11px] font-semibold text-purple-700 dark:bg-purple-950/40 dark:text-purple-300">
@@ -124,13 +124,6 @@ export default async function ProfilePage({
               </span>
             )}
           </div>
-          {isOwnProfile && profile.email && (
-            <p className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
-              <a href={`mailto:${profile.email}`} className="hover:text-[#0071e3] hover:underline">
-                {profile.email}
-              </a>
-            </p>
-          )}
           <p className="mt-1 text-sm text-gray-500 dark:text-neutral-400">
             Member since {new Date(profile.created_at).toLocaleDateString()}
           </p>

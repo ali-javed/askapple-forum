@@ -10,36 +10,36 @@ export default function Header() {
   const router = useRouter();
   const [user, setUser] = useState<{
     id: string;
-    email?: string;
-    isAnonymous?: boolean;
-    name?: string;
+    isAnonymous: boolean;
+    name: string;
   } | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const supabase = getBrowserSupabaseClient();
 
-    const mapUser = (u: any) =>
-      u
-        ? {
-            id: u.id,
-            email: u.email ?? undefined,
-            isAnonymous: !!u.is_anonymous,
-            name:
-              u.user_metadata?.full_name ||
-              u.user_metadata?.name ||
-              (u.is_anonymous ? "Guest" : undefined),
-          }
-        : null;
+    const mapUser = async (u: any) => {
+      if (!u) return null;
+      const { data: profile } = await supabase
+        .from("askapple_profiles")
+        .select("full_name")
+        .eq("id", u.id)
+        .maybeSingle();
+      return {
+        id: u.id,
+        isAnonymous: !!u.is_anonymous,
+        name: profile?.full_name || (u.is_anonymous ? "Guest" : "Community member"),
+      };
+    };
 
     supabase.auth.getUser().then(({ data }: any) => {
-      setUser(mapUser(data.user));
+      mapUser(data.user).then(setUser);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
-      setUser(mapUser(session?.user));
+      mapUser(session?.user).then(setUser);
     });
 
     return () => subscription.unsubscribe();
@@ -54,7 +54,7 @@ export default function Header() {
     router.refresh();
   };
 
-  const displayName = user?.name || user?.email?.split("@")[0] || "Guest";
+  const displayName = user?.name || "Guest";
   const isRealUser = user && !user.isAnonymous;
 
   return (
@@ -90,7 +90,7 @@ export default function Header() {
                 onClick={() => setMenuOpen((open) => !open)}
                 className="flex items-center gap-2 rounded-full border border-gray-200 p-1 pr-3 text-sm hover:bg-gray-50 dark:border-neutral-700 dark:hover:bg-neutral-800"
               >
-                <Avatar name={displayName} email={user.email || "guest"} size={28} />
+                <Avatar name={displayName} email={displayName} size={28} />
                 <span className="hidden max-w-28 truncate sm:inline">
                   {displayName}
                 </span>
