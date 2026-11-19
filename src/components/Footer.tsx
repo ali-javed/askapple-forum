@@ -12,14 +12,9 @@ export default function Footer() {
           <Link href="/new" className="hover:text-[#0071e3]">
             Ask a question
           </Link>
-          <a
-            href="https://github.com/ali-javed/askapple-forum#guidelines"
-            target="_blank"
-            rel="noreferrer"
-            className="hover:text-[#0071e3]"
-          >
+          <Link href="/guidelines" className="hover:text-[#0071e3]">
             Guidelines
-          </a>
+          </Link>
         </div>
       </div>
     </footer>
