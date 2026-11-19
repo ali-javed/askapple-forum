@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import AuthForm from "@/components/AuthForm";
+
+export const metadata: Metadata = {
+  title: "Create an account",
+  alternates: { canonical: "/signup" },
+  robots: { index: false, follow: true },
+};
 
 export default async function SignUpPage({
   searchParams,

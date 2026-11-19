@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import AcceptAnswerButton from "@/components/AcceptAnswerButton";
 import Avatar from "@/components/Avatar";
@@ -12,6 +13,51 @@ import type { PostWithAuthor, ThreadWithRelations } from "@/types/database";
 import { timeAgo } from "@/utils/format";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  let title = "Community question";
+  let description = "Community-driven answers for Apple products.";
+
+  try {
+    const supabase = await createClient();
+    const { data: thread } = await supabase
+      .from("askapple_threads")
+      .select("title")
+      .eq("id", id)
+      .maybeSingle();
+    if (thread?.title) title = thread.title as string;
+
+    const { data: firstPost } = await supabase
+      .from("askapple_posts")
+      .select("body")
+      .eq("thread_id", id)
+      .eq("post_number", 1)
+      .maybeSingle();
+    if (firstPost?.body) {
+      const clean = String(firstPost.body).replace(/\s+/g, " ").trim();
+      description = clean.length > 155 ? `${clean.slice(0, 152)}…` : clean;
+    }
+  } catch {
+    // Fall back to generic metadata if Supabase is unavailable.
+  }
+
+  return {
+    title,
+    description,
+    alternates: { canonical: `/t/${id}` },
+    openGraph: {
+      title: `${title} | iDiscussion`,
+      description,
+      url: `/t/${id}`,
+      type: "article",
+    },
+  };
+}
 
 export default async function ThreadPage({
   params,
@@ -71,8 +117,27 @@ export default async function ThreadPage({
 
   const nextPath = `/t/${id}`;
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "DiscussionForumPosting",
+    headline: thread.title,
+    datePublished: thread.created_at,
+    author: {
+      "@type": "Person",
+      name: thread.profiles?.full_name || "Community member",
+    },
+    articleBody: posts.find((post) => post.post_number === 1)?.body ?? "",
+    answerCount: Math.max(0, posts.length - 1),
+  };
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
+        }}
+      />
       <nav className="flex items-center gap-2 text-xs text-gray-400">
         <Link href="/" className="hover:text-[#0071e3]">
           Home

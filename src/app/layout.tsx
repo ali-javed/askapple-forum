@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { SITE_URL } from "@/utils/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,18 +15,30 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const siteDescription =
+  "An independent, community-run support forum for Mac, iPhone, iPad, Apple Watch and more. Not affiliated with Apple Inc.";
 
 export const metadata: Metadata = {
-  title: "iDiscussion — Independent Apple device community",
-  description:
-    "An independent, community-run support forum for Mac, iPhone, iPad, Apple Watch and more. Not affiliated with Apple Inc.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "iDiscussion — Independent Apple device community",
+    template: "%s | iDiscussion",
+  },
+  description: siteDescription,
+  applicationName: "iDiscussion",
+  alternates: { canonical: "/" },
+  robots: { index: true, follow: true },
   openGraph: {
     title: "iDiscussion — Independent Apple device community",
     description: "Community-driven answers for Apple products. Unofficial and not affiliated with Apple Inc.",
-    url: siteUrl,
+    url: "/",
     siteName: "iDiscussion",
     type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "iDiscussion — Independent Apple device community",
+    description: siteDescription,
   },
 };
 

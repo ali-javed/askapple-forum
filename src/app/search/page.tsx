@@ -1,9 +1,24 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import ThreadCard from "@/components/ThreadCard";
 import { createClient } from "@/utils/supabase/server";
 import type { ThreadWithRelations } from "@/types/database";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}): Promise<Metadata> {
+  const { q } = await searchParams;
+  const query = q?.trim().slice(0, 80);
+  return {
+    title: query ? `Search: ${query}` : "Search the community",
+    alternates: { canonical: "/search" },
+    robots: { index: false, follow: true },
+  };
+}
 
 const THREAD_SELECT =
   "id, title, is_solved, is_locked, is_pinned, view_count, post_count, last_activity_at, created_at, profiles:askapple_profiles!askapple_threads_author_id_fkey(id, full_name, avatar_url, reputation, role)";

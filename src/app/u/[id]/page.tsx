@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Avatar from "@/components/Avatar";
 import EditProfileForm from "@/components/EditProfileForm";
@@ -8,6 +9,31 @@ import type { Profile, ThreadWithRelations } from "@/types/database";
 import { timeAgo } from "@/utils/format";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  let name = "Community member";
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("askapple_profiles")
+      .select("full_name")
+      .eq("id", id)
+      .maybeSingle();
+    if (data?.full_name) name = data.full_name as string;
+  } catch {
+    // Use the default label if Supabase is unavailable.
+  }
+  return {
+    title: `${name}'s profile`,
+    alternates: { canonical: `/u/${id}` },
+    robots: { index: false, follow: true },
+  };
+}
 
 export default async function ProfilePage({
   params,

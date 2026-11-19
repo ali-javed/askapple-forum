@@ -1,9 +1,14 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import ThreadCard from "@/components/ThreadCard";
 import { createClient } from "@/utils/supabase/server";
 import type { ThreadWithRelations } from "@/types/database";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default async function HomePage() {
   const supabase = await createClient();

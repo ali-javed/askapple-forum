@@ -1,8 +1,16 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import NewThreadForm from "@/components/NewThreadForm";
 import { createClient } from "@/utils/supabase/server";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Ask a question",
+  description: "Ask the iDiscussion community about Mac, iPhone, iPad, Apple Watch and other Apple devices.",
+  alternates: { canonical: "/new" },
+  robots: { index: false, follow: true },
+};
 
 export default async function NewThreadPage() {
   const supabase = await createClient();
