@@ -107,6 +107,129 @@ export async function createPost(input: {
   }
 }
 
+/** Edit a reply body. Moderators and admins only. */
+export async function editPost(input: {
+  postId: string;
+  threadId: string;
+  body: string;
+}): Promise<ActionResult> {
+  try {
+    const user = await getServerUser();
+    if (!user || !["moderator", "admin"].includes(user.role)) {
+      return { ok: false, error: "Only moderators can edit posts." };
+    }
+    const body = input.body.trim();
+    if (body.length < 1 || body.length > 20000) {
+      return { ok: false, error: "Reply must be between 1 and 20000 characters." };
+    }
+
+    const supabase = await createClient();
+    const { error } = await (supabase.from("askapple_posts") as any)
+      .update({ body })
+      .eq("id", input.postId);
+
+    if (error) return { ok: false, error: error.message };
+
+    revalidatePath(`/t/${input.threadId}`);
+    revalidatePath("/");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: message(error) };
+  }
+}
+
+/** Edit a thread's title and question body. Moderators and admins only. */
+export async function editQuestion(input: {
+  threadId: string;
+  title: string;
+  body: string;
+}): Promise<ActionResult> {
+  try {
+    const user = await getServerUser();
+    if (!user || !["moderator", "admin"].includes(user.role)) {
+      return { ok: false, error: "Only moderators can edit questions." };
+    }
+    const title = input.title.trim();
+    const body = input.body.trim();
+    if (title.length < 4 || title.length > 200) {
+      return { ok: false, error: "Title must be between 4 and 200 characters." };
+    }
+    if (body.length < 1 || body.length > 20000) {
+      return { ok: false, error: "Question must be between 1 and 20000 characters." };
+    }
+
+    const supabase = await createClient();
+    const { error: threadError } = await (supabase.from("askapple_threads") as any)
+      .update({ title })
+      .eq("id", input.threadId);
+    if (threadError) return { ok: false, error: threadError.message };
+
+    const { error: postError } = await (supabase.from("askapple_posts") as any)
+      .update({ body })
+      .eq("thread_id", input.threadId)
+      .eq("post_number", 1);
+    if (postError) return { ok: false, error: postError.message };
+
+    revalidatePath(`/t/${input.threadId}`);
+    revalidatePath("/");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: message(error) };
+  }
+}
+
+/** Soft-delete a reply. Moderators and admins only. */
+export async function deletePost(input: {
+  postId: string;
+  threadId: string;
+}): Promise<ActionResult> {
+  try {
+    const user = await getServerUser();
+    if (!user || !["moderator", "admin"].includes(user.role)) {
+      return { ok: false, error: "Only moderators can delete posts." };
+    }
+
+    const supabase = await createClient();
+    const { error } = await (supabase.from("askapple_posts") as any)
+      .update({ is_deleted: true })
+      .eq("id", input.postId);
+
+    if (error) return { ok: false, error: error.message };
+
+    revalidatePath(`/t/${input.threadId}`);
+    revalidatePath("/");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: message(error) };
+  }
+}
+
+/** Delete a whole thread. Moderators and admins only. */
+export async function deleteThread(input: {
+  threadId: string;
+}): Promise<ActionResult> {
+  try {
+    const user = await getServerUser();
+    if (!user || !["moderator", "admin"].includes(user.role)) {
+      return { ok: false, error: "Only moderators can delete threads." };
+    }
+
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from("askapple_threads")
+      .delete()
+      .eq("id", input.threadId);
+
+    if (error) return { ok: false, error: error.message };
+
+    revalidatePath("/");
+    revalidatePath("/search");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: message(error) };
+  }
+}
+
 /** Upvote, downvote, or remove the user's existing vote. */
 export async function toggleVote(input: {
   postId: string;

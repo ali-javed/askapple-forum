@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import AcceptAnswerButton from "@/components/AcceptAnswerButton";
 import Avatar from "@/components/Avatar";
 import BookmarkButton from "@/components/BookmarkButton";
+import DeleteButton from "@/components/DeleteButton";
+import EditPostButton from "@/components/EditPostButton";
 import ReplyForm from "@/components/ReplyForm";
 import ReportButton from "@/components/ReportButton";
 import VoteControl from "@/components/VoteControl";
@@ -67,6 +69,7 @@ export default async function ThreadPage({
   const { id } = await params;
   const supabase = await createClient();
   const user = await getServerUser();
+  const isModerator = ["moderator", "admin"].includes(user?.role ?? "");
 
   const { data: threadData, error } = await supabase
     .from("askapple_threads")
@@ -186,6 +189,7 @@ export default async function ThreadPage({
           <div className="ml-auto flex items-center gap-3">
             <BookmarkButton threadId={id} initialSaved={bookmarked} signedIn={!!user} />
             <ReportButton threadId={id} signedIn={!!user} />
+            {isModerator && <DeleteButton kind="thread" threadId={id} />}
           </div>
         </div>
       </div>
@@ -234,7 +238,7 @@ export default async function ThreadPage({
                   <span className="text-xs text-gray-400">
                     {author?.reputation ?? 0} rep · {timeAgo(post.created_at)}
                   </span>
-                  <span className="ml-auto flex items-center gap-2">
+                  <div className="ml-auto flex flex-wrap items-center gap-2">
                     {isQuestion ? (
                       <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-600 dark:bg-neutral-800 dark:text-neutral-300">
                         Question
@@ -248,7 +252,19 @@ export default async function ThreadPage({
                       />
                     )}
                     <ReportButton postId={post.id} signedIn={!!user} />
-                  </span>
+                    {isModerator && (
+                      <EditPostButton
+                        kind={isQuestion ? "question" : "post"}
+                        postId={post.id}
+                        threadId={id}
+                        initialTitle={thread.title}
+                        initialBody={post.body}
+                      />
+                    )}
+                    {isModerator && !isQuestion && (
+                      <DeleteButton kind="post" postId={post.id} threadId={id} />
+                    )}
+                  </div>
                 </div>
 
                 <div className="mt-3 whitespace-pre-wrap text-sm leading-7 text-gray-700 dark:text-neutral-300">
