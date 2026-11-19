@@ -12,6 +12,7 @@ export default function Header() {
     id: string;
     isAnonymous: boolean;
     name: string;
+    role: string;
   } | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -22,13 +23,14 @@ export default function Header() {
       if (!u) return null;
       const { data: profile } = await supabase
         .from("askapple_profiles")
-        .select("full_name")
+        .select("full_name, role")
         .eq("id", u.id)
         .maybeSingle();
       return {
         id: u.id,
         isAnonymous: !!u.is_anonymous,
         name: profile?.full_name || (u.is_anonymous ? "Guest" : "Community member"),
+        role: profile?.role || "member",
       };
     };
 
@@ -104,6 +106,15 @@ export default function Header() {
                   >
                     {isRealUser ? "My profile" : "Guest profile"}
                   </Link>
+                  {(user.role === "moderator" || user.role === "admin") && (
+                    <Link
+                      href="/stats"
+                      onClick={() => setMenuOpen(false)}
+                      className="block px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-neutral-800"
+                    >
+                      Stats
+                    </Link>
+                  )}
                   {!isRealUser && (
                     <>
                       <Link

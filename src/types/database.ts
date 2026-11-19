@@ -245,6 +245,23 @@ export interface Database {
           created_at?: string;
         };
       };
+      askapple_site_visits: {
+        Row: {
+          id: string;
+          path: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          path: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          path?: string;
+          created_at?: string;
+        };
+      };
     };
     Views: {
       [_ in never]: never;

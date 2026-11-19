@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Analytics } from "@vercel/analytics/next";
+import VisitTracker from "@/components/VisitTracker";
 import { SITE_URL } from "@/utils/site";
 
 const geistSans = Geist({
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Header />
         <main className="min-h-[60vh]">{children}</main>
         <Analytics />
+        <VisitTracker />
         <Footer />
       </body>
     </html>
