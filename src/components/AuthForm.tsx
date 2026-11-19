@@ -148,7 +148,7 @@ export default function AuthForm({
       </h1>
       <p className="mt-1 text-sm text-gray-500 dark:text-neutral-400">
         {isSignUp
-          ? "Get answers from people who use Apple products every day. Confirmation email is optional for posting."
+          ? "Get answers from people who use Apple products every day."
           : "Sign in to ask questions, answer, and vote."}
       </p>
 
