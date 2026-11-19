@@ -1,5 +1,5 @@
-// TypeScript types for the AskApple Forum Supabase schema.
-// Keep in sync with supabase/migrations/0001_forum_schema.sql.
+// TypeScript types for the iDiscussion Supabase schema (askapple_* DB prefix).
+// Keep in sync with supabase/migrations/0001_askapple_forum_schema.sql.
 
 export type Json =
   | string

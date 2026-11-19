@@ -1,6 +1,6 @@
-# AskApple Forum
+# iDiscussion Forum
 
-A community support forum to replace Apple Support Communities, built with the same
+A community support forum for Apple product users, built with the same
 Vercel + Supabase stack as `refint-clean`.
 
 ## Stack
@@ -85,7 +85,7 @@ view counts without broad UPDATE access.
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY` (server-only)
-   - `NEXT_PUBLIC_SITE_URL` = your production URL, e.g. `https://askapple.vercel.app`
+   - `NEXT_PUBLIC_SITE_URL` = your production URL, e.g. `https://<your-domain>`
 4. In Supabase **Authentication → URL Configuration**, add
    `https://<your-domain>/auth/callback` to the redirect allowlist.
 5. Deploy. `npm run build` and `npm run lint` should both pass.

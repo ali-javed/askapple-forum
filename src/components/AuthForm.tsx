@@ -65,7 +65,7 @@ export default function AuthForm({
   return (
     <div className="mx-auto w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
       <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
-        {isSignUp ? "Join AskApple" : "Welcome back"}
+        {isSignUp ? "Join iDiscussion" : "Welcome back"}
       </h1>
       <p className="mt-1 text-sm text-gray-500 dark:text-neutral-400">
         {isSignUp
@@ -133,7 +133,7 @@ export default function AuthForm({
       </form>
 
       <p className="mt-6 text-center text-sm text-gray-500 dark:text-neutral-400">
-        {isSignUp ? "Already a member?" : "New to AskApple?"}{" "}
+        {isSignUp ? "Already a member?" : "New to iDiscussion?"}{" "}
         <Link
           href={isSignUp ? "/signin" : "/signup"}
           className="font-medium text-[#0071e3] hover:underline"

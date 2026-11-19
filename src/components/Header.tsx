@@ -62,9 +62,9 @@ export default function Header() {
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4">
         <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0071e3] text-sm text-white">
-            A
+            i
           </span>
-          <span className="text-lg">AskApple</span>
+          <span className="text-lg">iDiscussion</span>
           <span className="hidden rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-500 sm:inline dark:bg-neutral-800 dark:text-neutral-400">
             Community
           </span>

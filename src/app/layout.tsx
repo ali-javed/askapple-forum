@@ -17,14 +17,14 @@ const geistMono = Geist_Mono({
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export const metadata: Metadata = {
-  title: "AskApple — Apple support community",
+  title: "iDiscussion — Apple support community",
   description:
     "Ask questions and get answers about Mac, iPhone, iPad, Apple Watch, macOS and more from a community of Apple users.",
   openGraph: {
-    title: "AskApple — Apple support community",
+    title: "iDiscussion — Apple support community",
     description: "Community-driven answers for Apple products.",
     url: siteUrl,
-    siteName: "AskApple",
+    siteName: "iDiscussion",
     type: "website",
   },
 };
