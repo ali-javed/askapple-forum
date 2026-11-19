@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Analytics } from "@vercel/analytics/next";
 import { SITE_URL } from "@/utils/site";
 
 const geistSans = Geist({
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="antialiased">
         <Header />
         <main className="min-h-[60vh]">{children}</main>
+        <Analytics />
         <Footer />
       </body>
     </html>
